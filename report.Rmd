@@ -21,3 +21,137 @@ knitr::opts_chunk$set(
 * what you think the expected out of sample error is, and 
 * why you made the choices you did. 
 * You will also use your prediction model to predict 20 different test cases.
+
+```{r}
+if(!file.exists("./data")) {
+     dir.create("./data")
+}
+if (!file.exists("./data/training.csv") |
+    !file.exists("./data/testing.csv")) {
+     fileUrl1 <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+     fileUrl2 <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+     download.file(fileUrl1, destfile = "./data/training.csv")
+     download.file(fileUrl2, destfile = "./data/testing.csv")
+}
+
+buildData <- read.csv("./data/training.csv")
+validation <- read.csv("./data/testing.csv")
+
+head(buildData, 2)
+head(validation, 2)
+```
+
+
+```{r wageex}
+library(caret)
+allmissing <- sapply(validation, function(x)!all(is.na(x)))
+buildData[is.na(buildData)] <- 0
+validation[is.na(validation)] <- 0
+buildData <- buildData[,allmissing]
+validation <- validation[,allmissing]
+
+buildData <- buildData[,-1] 
+validation <- validation[,-1] 
+
+inTrain <- createDataPartition(y=buildData$classe, p=0.7, list = FALSE)
+training <- buildData[inTrain,]
+testing <- buildData[-inTrain,]
+
+
+
+
+
+```
+
+### build 2 models
+
+```{r warning=FALSE}
+library(party)
+
+# mod1 <- train(classe~., method ="glm", data = training)
+mod2 <- train(classe~., method ="rf", data = training, trControl = trainControl(method = "cv"),number = 3)
+mod3 <- train(classe~., method ="rpart", data = training)
+# mod4 <- train(classe~., method ="ctree", data = training)
+# mod5 <- mob(classe~age+education|year+maritl+race+region+jobclass+health+health_ins,data = training)
+
+```
+### compare them
+```{r dependson=c(-1)}
+# pred1 <- predict(mod1, testing)
+pred2 <- predict(mod2, testing)
+pred3 <- predict(mod3, testing)
+# pred4 <- predict(mod4, testing)
+# pred5 <- predict(mod5, testing)
+                 
+qplot(pred1,pred2, colour = wage, data = testing)
+qplot(pred3,pred4, colour = wage, data = testing)
+table(pred3, testing$classe)
+table(pred2, testing$classe)
+
+library(rattle)
+fancyRpartPlot(mod3$finalModel)
+
+plot(mod4$finalModel)
+plot(mod5)
+
+qplot(wage,pred5, colour = wage, data = testing)
+
+```
+
+### make a model that combines predictors
+
+```{r dependson=c(-1, -2)}
+predDF2 <- data.frame(pred1, pred2, wage = testing$wage)
+#variant with 5
+predDF5 <- data.frame(pred1, pred2, pred3, pred4, pred5, wage = testing$wage)
+
+combModFit2 <- train(wage~., method = "gam", data = predDF2)
+combModFit5 <- train(wage~., method = "gam", data = predDF5)
+combPred2 <- predict(combModFit2,predDF2)
+combPred5 <- predict(combModFit5,predDF2)
+
+```
+
+#### testing errors
+```{r}
+MLmetrics::RMSE(y_pred = pred1,y_true = testing$wage)
+MLmetrics::RMSE(y_pred = pred2,y_true = testing$wage)
+MLmetrics::RMSE(y_pred = combPred2,y_true = testing$wage)
+
+MLmetrics::RMSE(y_pred = pred3,y_true = testing$wage)
+MLmetrics::RMSE(y_pred = pred4,y_true = testing$wage)
+MLmetrics::RMSE(y_pred = pred5,y_true = testing$wage)
+MLmetrics::RMSE(y_pred = combPred5,y_true = testing$wage)
+
+plot(combModFit5$finalModel)
+```
+### on a validation
+```{r}
+pred1V <- predict(mod1, validation)
+pred2V <- predict(mod2, validation)
+predVDF2 <- data.frame(pred1 = pred1V, pred2 = pred2V)
+combPredV2 <- predict(combModFit2, predVDF2)
+
+pred3V <- predict(mod3, validation)
+pred4V <- predict(mod4, validation)
+pred5V <- predict(mod5, validation)
+predVDF5 <-
+    data.frame(
+        pred1 = pred1V,
+        pred2 = pred2V,
+        pred3 = pred3V,
+        pred4 = pred4V,
+        pred5 = pred5V
+    )
+combPredV5 <- predict(combModFit5,predVDF5)
+MLmetrics::RMSE(y_pred = pred1V,y_true = validation$wage)
+MLmetrics::RMSE(y_pred = pred2V,y_true = validation$wage)
+MLmetrics::RMSE(y_pred = combPredV2,y_true = validation$wage)
+## 5 part model
+MLmetrics::RMSE(y_pred = pred3V,y_true = validation$wage)
+MLmetrics::RMSE(y_pred = pred4V,y_true = validation$wage)
+MLmetrics::RMSE(y_pred = pred5V,y_true = validation$wage)
+MLmetrics::RMSE(y_pred = combPredV5,y_true = validation$wage)
+```
+
+
