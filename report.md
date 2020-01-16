@@ -1,5 +1,5 @@
 ---
-title: "Practical machine learning  lectures 4"
+title: "Practical machine learning  final assignment, predicting class variable with ML"
 author: "Kirill Setdekov"
 date: "15 01 2020"
 output:
@@ -44,25 +44,9 @@ Some columns are full of NAs and are NA in the final 12 values, so I mark and re
 
 ```r
 library(caret)
-```
-
-```
-## Warning: package 'caret' was built under R version 3.6.2
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```r
 ## temp
 shortenbuild <- createDataPartition(y=data$classe, p=0.1, list = FALSE)
 data <- data[shortenbuild,]
-
 ## temp
 
 allmissing <- sapply(quiz, function(x)!all(is.na(x)))
@@ -106,6 +90,16 @@ dim(validation)
 ```
 ## [1] 587  59
 ```
+#### rational for choices and cross-validation
+In a differetn model, i tried leaving all variables, but it a) increased run time significantly, b) was overly reliant on the variable X present in the training dataset. So I chose to exlude variable "X".
+
+Additional clarification - as the dataset was rather large, i split training data into 3 part:
+
+1. Validation (0.3 of the initial dataset)
+2. Training (0.49 of the initial dataset)
+3. Testin (0.21 of the initial dataset)
+
+This alloed us to use training and testing multiple times, only comparing the model once on the Validation set before predicting the test 20 samples for the test.
 
 ### build 3 models 
 
@@ -252,5 +246,107 @@ confusionMatrix(combPredV,validation$classe)
 ## Detection Prevalence   0.2862   0.1925   0.1806   0.1584   0.1823
 ## Balanced Accuracy      0.9988   0.9793   0.9781   0.9657   0.9897
 ```
+We can see that the ensemble model outperforms all three indiviual models, but it is only marginally better than the Generalized Boosted Model.
+
+### Final confution matrix for the validation set
+
+```r
+library(jcolors) 
+```
+
+```
+## Warning: package 'jcolors' was built under R version 3.6.2
+```
+
+```r
+levels = c('A', 'B', 'C', 'D', 'E')
+validationresults = data.frame(ordered(validation$classe, levels = levels),
+                               ordered(combPredV, levels = levels))
 
 
+names(validationresults) = c("Actual", "Predicted") 
+ 
+#compute frequency of actual categories
+actual = as.data.frame(table(validationresults$Actual))
+names(actual) = c("Actual","ActualFreq")
+ 
+#build confusion matrix
+confusion = as.data.frame(table(validationresults$Actual, validationresults$Predicted))
+names(confusion) = c("Actual","Predicted","Freq")
+ 
+#calculate percentage of test cases based on actual frequency
+confusion = merge(confusion, actual, by=c("Actual"))
+confusion$Percent = confusion$Freq/confusion$ActualFreq*100
+ 
+#render plot
+ggplot(aes(x=Actual, y=ordered(Predicted, levels=rev(levels)),fill=Percent),data=confusion) +
+geom_tile( color="black",size=0.1) +
+labs(x="Actual",y="Predicted") + 
+geom_text(aes( label=sprintf("%.1f", Percent)),data=confusion, size=3, colour="black") +
+scale_fill_jcolors_contin(palette = "pal10")+
+geom_tile(aes(x=Actual,y=ordered(Predicted, levels=rev(levels))),data=subset(confusion, as.character(Actual)==as.character(Predicted)), color="black",size=1, fill="black", alpha=0) 
+```
+
+![](report_files/figure-html/confusion plot-1.png)<!-- -->
+
+### Final results for the quiz
+
+
+```r
+require(knitr)
+```
+
+```
+## Loading required package: knitr
+```
+
+```
+## Warning: package 'knitr' was built under R version 3.6.2
+```
+
+```r
+pred1q <- predict(mod1, quiz)
+pred2q <- predict(mod2, quiz)
+pred3q <- predict(mod3, quiz)
+
+predq <-
+    data.frame(
+        pred1 = pred1q,
+        pred2 = pred2q,
+        pred3 = pred3q
+    )
+combPredV <- predict(combModFit3,predq)
+quizresults = data.frame(1:dim(quiz)[1],combPredV)
+names(quizresults) = c("N", "Predicted") 
+kable(quizresults)
+```
+
+
+
+  N  Predicted 
+---  ----------
+  1  B         
+  2  A         
+  3  B         
+  4  A         
+  5  A         
+  6  E         
+  7  D         
+  8  B         
+  9  A         
+ 10  A         
+ 11  B         
+ 12  C         
+ 13  B         
+ 14  A         
+ 15  E         
+ 16  E         
+ 17  A         
+ 18  B         
+ 19  B         
+ 20  B         
+
+## Conclusions
+
+My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer.
+Final score for the quiz was 100%
