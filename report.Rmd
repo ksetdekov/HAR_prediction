@@ -88,9 +88,9 @@ I chose 4 methods:
 
 ```{r modelling, warning=FALSE}
 set.seed(45)
-mod1 <- train(classe~., method ="gbm", data = training, verbose = T)
-mod2 <- train(classe~., method ="rf", data = training, trControl = trainControl(method = "cv"),number = 3, verbose = T)
-mod3 <- train(classe~., method ="lda", data = training, verbose = T)
+mod1 <- train(classe~., method ="gbm", data = training, verbose = FALSE)
+mod2 <- train(classe~., method ="rf", data = training, trControl = trainControl(method = "cv"),number = 3, verbose = FALSE)
+mod3 <- train(classe~., method ="lda", data = training, verbose = FALSE)
 ```
 ### compare them
 ```{r dependson=c(-1)}
@@ -107,7 +107,7 @@ MLmetrics::Accuracy(pred3,testing$classe)
 ### make a model that combines predictors
 
 ```{r dependson=c(-1, -2)}
-combModFit3 <- train(classe~., method = "gbm", data = predDF3)
+combModFit3 <- train(classe~., method = "gbm", data = predDF3, verbose = FALSE)
 combPred <- predict(combModFit3,predDF3)
 MLmetrics::Accuracy(combPred,testing$classe)
 ```
@@ -133,4 +133,19 @@ MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)
 confusionMatrix(combPredV,validation$classe)
 ```
 
+```{r}
+require(tsne)
+
+asNumeric <- function(x) as.numeric(x)
+factorsNumeric <- function(d) modifyList(d, lapply(d[, sapply(d, is.factor)],   
+                                                   asNumeric))
+f <- factorsNumeric(validation[,1:58])
+test_tsne <- tsne((f))
+xy <- as.data.frame(test_tsne)
+colnames(xy) <- c('x', 'y')
+xy$label <- validation$classe
+require(GGally)
+ggpairs(xy , aes( colour = label))
+
+```
 
