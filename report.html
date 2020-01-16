@@ -495,7 +495,8 @@ MLmetrics::Accuracy(y_pred = pred1V,y_true = validation$classe)</code></pre>
 <pre class="r"><code>MLmetrics::Accuracy(y_pred = pred3V,y_true = validation$classe)</code></pre>
 <pre><code>## [1] 0.8569244</code></pre>
 <pre class="r"><code>## this is a combined model
-MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)</code></pre>
+finaccuracy &lt;- MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)
+finaccuracy</code></pre>
 <pre><code>## [1] 0.9989805</code></pre>
 <pre class="r"><code>confusionMatrix(combPredV,validation$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
@@ -565,10 +566,8 @@ geom_tile(aes(x=Actual,y=ordered(Predicted, levels=rev(levels))),data=subset(con
 </div>
 <div id="final-results-for-the-quiz" class="section level3">
 <h3>Final results for the quiz</h3>
-<pre class="r"><code>require(knitr)</code></pre>
-<pre><code>## Loading required package: knitr</code></pre>
-<pre><code>## Warning: package 'knitr' was built under R version 3.6.2</code></pre>
-<pre class="r"><code>pred1q &lt;- predict(mod1, quiz)
+<pre class="r"><code>require(knitr)
+pred1q &lt;- predict(mod1, quiz)
 pred2q &lt;- predict(mod2, quiz)
 pred3q &lt;- predict(mod3, quiz)
 
@@ -578,8 +577,8 @@ predq &lt;-
         pred2 = pred2q,
         pred3 = pred3q
     )
-combPredV &lt;- predict(combModFit3,predq)
-quizresults = data.frame(1:dim(quiz)[1],combPredV)
+combPredq &lt;- predict(combModFit3,predq)
+quizresults = data.frame(1:dim(quiz)[1],combPredq)
 names(quizresults) = c(&quot;N&quot;, &quot;Predicted&quot;) 
 kable(quizresults)</code></pre>
 <table>
@@ -676,7 +675,8 @@ kable(quizresults)</code></pre>
 </div>
 <div id="conclusions" class="section level2">
 <h2>Conclusions</h2>
-<p>My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer. On the whole dataset, accuracy is 99.9% Final score for the quiz was 100%</p>
+<p>My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer. On the whole dataset, accuracy is 99.9% Out-of-sample error is esitmated on the validation set <span class="math inline">\(1-Accuracy.Validation\)</span> and is 0.001</p>
+<p>Final score for the quiz was 100%</p>
 </div>
 
 

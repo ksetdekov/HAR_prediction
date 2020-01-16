@@ -216,7 +216,8 @@ MLmetrics::Accuracy(y_pred = pred3V,y_true = validation$classe)
 
 ```r
 ## this is a combined model
-MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)
+finaccuracy <- MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)
+finaccuracy
 ```
 
 ```
@@ -302,17 +303,6 @@ geom_tile(aes(x=Actual,y=ordered(Predicted, levels=rev(levels))),data=subset(con
 
 ```r
 require(knitr)
-```
-
-```
-## Loading required package: knitr
-```
-
-```
-## Warning: package 'knitr' was built under R version 3.6.2
-```
-
-```r
 pred1q <- predict(mod1, quiz)
 pred2q <- predict(mod2, quiz)
 pred3q <- predict(mod3, quiz)
@@ -323,8 +313,8 @@ predq <-
         pred2 = pred2q,
         pred3 = pred3q
     )
-combPredV <- predict(combModFit3,predq)
-quizresults = data.frame(1:dim(quiz)[1],combPredV)
+combPredq <- predict(combModFit3,predq)
+quizresults = data.frame(1:dim(quiz)[1],combPredq)
 names(quizresults) = c("N", "Predicted") 
 kable(quizresults)
 ```
@@ -357,4 +347,7 @@ kable(quizresults)
 ## Conclusions
 
 My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer. On the whole dataset, accuracy is 99.9%
+Out-of-sample error is esitmated on the validation set $1-Accuracy.Validation$ and is 0.001
+
+
 Final score for the quiz was 100%
