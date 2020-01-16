@@ -534,9 +534,8 @@ MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)</code></pre>
 </div>
 <div id="final-confution-matrix-for-the-validation-set" class="section level3">
 <h3>Final confution matrix for the validation set</h3>
-<pre class="r"><code>library(jcolors) </code></pre>
-<pre><code>## Warning: package 'jcolors' was built under R version 3.6.2</code></pre>
-<pre class="r"><code>levels = c('A', 'B', 'C', 'D', 'E')
+<pre class="r"><code>library(jcolors) 
+levels = c('A', 'B', 'C', 'D', 'E')
 validationresults = data.frame(ordered(validation$classe, levels = levels),
                                ordered(combPredV, levels = levels))
 

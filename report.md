@@ -267,13 +267,6 @@ We can see that the ensemble model outperforms all three indiviual models, but i
 
 ```r
 library(jcolors) 
-```
-
-```
-## Warning: package 'jcolors' was built under R version 3.6.2
-```
-
-```r
 levels = c('A', 'B', 'C', 'D', 'E')
 validationresults = data.frame(ordered(validation$classe, levels = levels),
                                ordered(combPredV, levels = levels))
@@ -302,7 +295,7 @@ scale_fill_jcolors_contin(palette = "pal10")+
 geom_tile(aes(x=Actual,y=ordered(Predicted, levels=rev(levels))),data=subset(confusion, as.character(Actual)==as.character(Predicted)), color="black",size=1, fill="black", alpha=0) 
 ```
 
-![](report_files/figure-html/confusion plot-1.png)<!-- -->
+![](report_files/figure-html/confusion_plot-1.png)<!-- -->
 
 ### Final results for the quiz
 

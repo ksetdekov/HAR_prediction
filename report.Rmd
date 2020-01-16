@@ -144,7 +144,7 @@ confusionMatrix(combPredV,validation$classe)
 We can see that the ensemble model outperforms all three indiviual models, but it is only marginally better than the Generalized Boosted Model.
 
 ### Final confution matrix for the validation set
-```{r confusion plot}
+```{r confusion_plot}
 library(jcolors) 
 levels = c('A', 'B', 'C', 'D', 'E')
 validationresults = data.frame(ordered(validation$classe, levels = levels),
