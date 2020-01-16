@@ -46,10 +46,10 @@ Some columns are full of NAs and are NA in the final 12 values, so I mark and re
 
 ```{r traincontrol}
 library(caret)
-## temp
-shortenbuild <- createDataPartition(y=data$classe, p=0.1, list = FALSE)
-data <- data[shortenbuild,]
-## temp
+# ## temp
+# shortenbuild <- createDataPartition(y=data$classe, p=0.1, list = FALSE)
+# data <- data[shortenbuild,]
+# ## temp
 
 allmissing <- sapply(quiz, function(x)!all(is.na(x)))
 data[is.na(data)] <- 0
@@ -197,5 +197,5 @@ kable(quizresults)
 
 ## Conclusions
 
-My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer.
+My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer. On the whole dataset, accuracy is 99.9%
 Final score for the quiz was 100%

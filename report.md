@@ -44,10 +44,25 @@ Some columns are full of NAs and are NA in the final 12 values, so I mark and re
 
 ```r
 library(caret)
-## temp
-shortenbuild <- createDataPartition(y=data$classe, p=0.1, list = FALSE)
-data <- data[shortenbuild,]
-## temp
+```
+
+```
+## Warning: package 'caret' was built under R version 3.6.2
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```r
+# ## temp
+# shortenbuild <- createDataPartition(y=data$classe, p=0.1, list = FALSE)
+# data <- data[shortenbuild,]
+# ## temp
 
 allmissing <- sapply(quiz, function(x)!all(is.na(x)))
 data[is.na(data)] <- 0
@@ -72,7 +87,7 @@ dim(training)
 ```
 
 ```
-## [1] 967  59
+## [1] 9619   59
 ```
 
 ```r
@@ -80,7 +95,7 @@ dim(testing)
 ```
 
 ```
-## [1] 410  59
+## [1] 4118   59
 ```
 
 ```r
@@ -88,7 +103,7 @@ dim(validation)
 ```
 
 ```
-## [1] 587  59
+## [1] 5885   59
 ```
 #### rational for choices and cross-validation
 In a differetn model, i tried leaving all variables, but it a) increased run time significantly, b) was overly reliant on the variable X present in the training dataset. So I chose to exlude variable "X".
@@ -130,7 +145,7 @@ MLmetrics::Accuracy(pred1,testing$classe)
 ```
 
 ```
-## [1] 0.9634146
+## [1] 0.9958718
 ```
 
 ```r
@@ -138,7 +153,7 @@ MLmetrics::Accuracy(pred2,testing$classe)
 ```
 
 ```
-## [1] 0.9536585
+## [1] 0.998543
 ```
 
 ```r
@@ -146,7 +161,7 @@ MLmetrics::Accuracy(pred3,testing$classe)
 ```
 
 ```
-## [1] 0.8585366
+## [1] 0.8550267
 ```
 
 ### make a model that combines predictors
@@ -159,7 +174,7 @@ MLmetrics::Accuracy(combPred,testing$classe)
 ```
 
 ```
-## [1] 0.9829268
+## [1] 0.998543
 ```
 
 ### on a validation
@@ -180,7 +195,7 @@ MLmetrics::Accuracy(y_pred = pred1V,y_true = validation$classe)
 ```
 
 ```
-## [1] 0.9608177
+## [1] 0.9964316
 ```
 
 ```r
@@ -188,7 +203,7 @@ MLmetrics::Accuracy(y_pred = pred2V,y_true = validation$classe)
 ```
 
 ```
-## [1] 0.9574106
+## [1] 0.9989805
 ```
 
 ```r
@@ -196,7 +211,7 @@ MLmetrics::Accuracy(y_pred = pred3V,y_true = validation$classe)
 ```
 
 ```
-## [1] 0.8517888
+## [1] 0.8569244
 ```
 
 ```r
@@ -205,7 +220,7 @@ MLmetrics::Accuracy(y_pred = combPredV,y_true = validation$classe)
 ```
 
 ```
-## [1] 0.9744463
+## [1] 0.9989805
 ```
 
 ```r
@@ -216,35 +231,35 @@ confusionMatrix(combPredV,validation$classe)
 ## Confusion Matrix and Statistics
 ## 
 ##           Reference
-## Prediction   A   B   C   D   E
-##          A 167   1   0   0   0
-##          B   0 110   3   0   0
-##          C   0   2  99   5   0
-##          D   0   1   0  90   2
-##          E   0   0   0   1 106
+## Prediction    A    B    C    D    E
+##          A 1674    0    0    0    0
+##          B    0 1137    0    0    0
+##          C    0    2 1024    1    0
+##          D    0    0    2  962    0
+##          E    0    0    0    1 1082
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9744          
-##                  95% CI : (0.9582, 0.9856)
+##                Accuracy : 0.999           
+##                  95% CI : (0.9978, 0.9996)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc > NIR] : < 2.2e-16       
 ##                                           
-##                   Kappa : 0.9677          
+##                   Kappa : 0.9987          
 ##                                           
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   0.9649   0.9706   0.9375   0.9815
-## Specificity            0.9976   0.9937   0.9856   0.9939   0.9979
-## Pos Pred Value         0.9940   0.9735   0.9340   0.9677   0.9907
-## Neg Pred Value         1.0000   0.9916   0.9938   0.9879   0.9958
-## Prevalence             0.2845   0.1942   0.1738   0.1635   0.1840
-## Detection Rate         0.2845   0.1874   0.1687   0.1533   0.1806
-## Detection Prevalence   0.2862   0.1925   0.1806   0.1584   0.1823
-## Balanced Accuracy      0.9988   0.9793   0.9781   0.9657   0.9897
+## Sensitivity            1.0000   0.9982   0.9981   0.9979   1.0000
+## Specificity            1.0000   1.0000   0.9994   0.9996   0.9998
+## Pos Pred Value         1.0000   1.0000   0.9971   0.9979   0.9991
+## Neg Pred Value         1.0000   0.9996   0.9996   0.9996   1.0000
+## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
+## Detection Rate         0.2845   0.1932   0.1740   0.1635   0.1839
+## Detection Prevalence   0.2845   0.1932   0.1745   0.1638   0.1840
+## Balanced Accuracy      1.0000   0.9991   0.9987   0.9988   0.9999
 ```
 We can see that the ensemble model outperforms all three indiviual models, but it is only marginally better than the Generalized Boosted Model.
 
@@ -348,5 +363,5 @@ kable(quizresults)
 
 ## Conclusions
 
-My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer.
+My approach resulted in above 97% accuracy even when I ran the code on 10% of the provided data due to a slow computer. On the whole dataset, accuracy is 99.9%
 Final score for the quiz was 100%
